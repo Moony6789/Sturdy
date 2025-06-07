@@ -819,7 +819,7 @@ class VariableInterestSturdySiloStrategy(ChainBasedPoolModel):
     @alru_cache(maxsize=512, ttl=60)
     async def supply_rate(self, amount: int) -> int:
         # amount scaled down to the asset's decimals from 18 decimals (wei)
-        print("===step1===")
+        print("===step1===", amount, self._user_deposits)
         delta = amount - self._user_deposits
         print("===step2===")
         """Returns supply rate given new deposit amount"""

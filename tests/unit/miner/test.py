@@ -26,7 +26,7 @@ from sturdy.protocol import AllocateAssets
 from sturdy.providers import POOL_DATA_PROVIDER_TYPE
 
 THRESHOLD = 1
-INCREMENT_STEP = 20
+INCREMENT_STEP = 3
 # Fix: PoolModel type annotation and import
 PoolModel = Annotated[BaseModel, Field(discriminator="pool_model_disc")]
 
@@ -77,7 +77,6 @@ class OptimizerContext:
         marginal_apys = {}
         best_pool_addr = ADDRESS_ZERO
         increment = self.total_assets // INCREMENT_STEP
-        print("remaining_assets", remaining_assets, increment)
         while remaining_assets >= increment:
             # print("remaining assets", remaining_assets)
             # print("increment", increment)
@@ -91,8 +90,7 @@ class OptimizerContext:
             best_pool_addr = max(marginal_apys, key=marginal_apys.get)
             allocations[best_pool_addr] += increment
             remaining_assets -= increment
-            print("remaining_assets", remaining_assets, increment)
-
+            print("allocations values:", allocations)
             pool = self.pools[best_pool_addr]
             decimals = 6
             # print("underlying_asset_contract", pool._underlying_asset_contract, pool._user_deposits)
@@ -103,13 +101,10 @@ class OptimizerContext:
             if hasattr(pool, '_user_deposits'):
                 pool._user_deposits += increment * 10 ** decimals // 10 ** 18
 
-        print("remain_assets", remaining_assets, marginal_apys, best_pool_addr)
-        print("allocations values:", allocations)
+
         if remaining_assets > 0 and marginal_apys:
             best_pool_addr = max(marginal_apys, key=marginal_apys.get)
-            print("before calculate", allocations[best_pool_addr])
             allocations[best_pool_addr] += remaining_assets
-            print("after calculate", allocations[best_pool_addr])
 
         print("allocations values:", allocations)
         non_zero_allocs = sum(1 for amt in allocations.values() if amt > 0)
@@ -145,24 +140,24 @@ async def main():
                     "contract_address": "0x6311fF24fb15310eD3d2180D3d0507A21a8e5227",
                     "pool_data_provider_type": "ETHEREUM_MAINNET"
                 },
-                # "0x200723063111f9f8f1d44c0F30afAdf0C0b1a04b": {
-                #     "pool_model_disc": "EVM_CHAIN_BASED",
-                #     "pool_type": "STURDY_SILO",
-                #     "contract_address": "0x200723063111f9f8f1d44c0F30afAdf0C0b1a04b",
-                #     "pool_data_provider_type": "ETHEREUM_MAINNET"
-                # },
-                # "0x26fe402A57D52c8a323bb6e09f06489C8216aC88": {
-                #     "pool_model_disc": "EVM_CHAIN_BASED",
-                #     "pool_type": "STURDY_SILO",
-                #     "contract_address": "0x26fe402A57D52c8a323bb6e09f06489C8216aC88",
-                #     "pool_data_provider_type": "ETHEREUM_MAINNET"
-                # },
-                # "0x8dDE9A50a91cc0a5DaBdc5d3931c1AF60408c84D": {
-                #     "pool_model_disc": "EVM_CHAIN_BASED",
-                #     "pool_type": "STURDY_SILO",
-                #     "contract_address": "0x8dDE9A50a91cc0a5DaBdc5d3931c1AF60408c84D",
-                #     "pool_data_provider_type": "ETHEREUM_MAINNET"
-                # }
+                "0x200723063111f9f8f1d44c0F30afAdf0C0b1a04b": {
+                    "pool_model_disc": "EVM_CHAIN_BASED",
+                    "pool_type": "STURDY_SILO",
+                    "contract_address": "0x200723063111f9f8f1d44c0F30afAdf0C0b1a04b",
+                    "pool_data_provider_type": "ETHEREUM_MAINNET"
+                },
+                "0x26fe402A57D52c8a323bb6e09f06489C8216aC88": {
+                    "pool_model_disc": "EVM_CHAIN_BASED",
+                    "pool_type": "STURDY_SILO",
+                    "contract_address": "0x26fe402A57D52c8a323bb6e09f06489C8216aC88",
+                    "pool_data_provider_type": "ETHEREUM_MAINNET"
+                },
+                "0x8dDE9A50a91cc0a5DaBdc5d3931c1AF60408c84D": {
+                    "pool_model_disc": "EVM_CHAIN_BASED",
+                    "pool_type": "STURDY_SILO",
+                    "contract_address": "0x8dDE9A50a91cc0a5DaBdc5d3931c1AF60408c84D",
+                    "pool_data_provider_type": "ETHEREUM_MAINNET"
+                }
             }
         }
     }
